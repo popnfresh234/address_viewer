@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
-import { InfoWindow } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
+import latlngArr from '../../data/lat-lng-arr.json';
 
 class Map extends Component {
   constructor( props ) {
@@ -13,25 +13,17 @@ class Map extends Component {
       height: '100vh',
     };
     this.state = {
-      markers: [],
+      markers: latlngArr,
       showInfo: false,
-      infoPos: {},
+      marker: {},
     };
   }
 
 
-  componentDidMount() {
-    fetch( '/data/' )
-      .then( result => result.json() )
-      .then( ( markers ) => {
-        this.setState( { markers } );
-      } );
-  }
-
   onMarkerClick( marker ) {
     this.setState( {
       showInfo: true,
-      infoPos: marker,
+      marker,
     } );
   }
 
@@ -51,13 +43,19 @@ class Map extends Component {
           zoom={12}
           onLoad={this.onMapLoad}
         >
-          {this.state.markers.map( marker => <Marker position={marker} key={Math.random()} onClick={e => this.onMarkerClick( marker, e )} /> )}
+          {this.state.markers.map( marker =>
+            ( <Marker
+              position={marker.latlng}
+              key={Math.random()}
+              onClick={e => this.onMarkerClick( marker, e )}
+            /> ) )}
+
           {this.state.showInfo &&
           <InfoWindow
-            position={this.state.infoPos}
+            position={this.state.marker.latlng}
             onCloseClick={this.onCloseClick}
           >
-            <h1>{this.state.infoPos.lat}</h1>
+            <h1>{this.state.marker.name}</h1>
           </InfoWindow>}
         </GoogleMap>
       </LoadScript>
